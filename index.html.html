@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מאגר ארגוני פורום נראות</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F2EC;--surface:#fff;--border:#E5E1D8;--border-h:#C0BAB0;
+  --text:#1A1916;--text2:#6B6760;--muted:#A9A59E;
+  --green:#0F6E56;--green-l:#E1F5EE;--green-m:#1D9E75;
+  --purple:#534AB7;--purple-l:#EEEDFE;
+  --amber:#F0A429;--amber-l:#FFF8EC;
+  --r:10px;--r-lg:14px;
+}
+body{font-family:"Heebo",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;position:sticky;top:0;z-index:200;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.hdr-inner{max-width:1100px;margin:0 auto;padding:14px 0 0}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{height:40px;width:auto;object-fit:contain;display:block}
+.brand-sep{width:1px;height:22px;background:var(--border);flex-shrink:0}
+.brand-lbl{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.06em}
+.count-pill{background:var(--green-l);color:var(--green);font-size:12px;font-weight:700;padding:5px 13px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.tip{background:var(--amber-l);border:1px solid #F0C060;border-radius:8px;padding:9px 14px;font-size:12.5px;color:#7A5000;display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;line-height:1.55}
+.tip strong{font-weight:600}
+.sw{position:relative;margin-bottom:11px}
+.si{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;width:16px;height:16px}
+.search{width:100%;height:44px;border:1.5px solid var(--border);border-radius:var(--r);padding:0 42px 0 40px;font-family:"Heebo",sans-serif;font-size:14px;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s,background .15s;direction:rtl}
+.search:focus{border-color:var(--green-m);background:#fff}
+.search::placeholder{color:var(--muted)}
+.clr{position:absolute;left:11px;top:50%;transform:translateY(-50%);background:var(--border);border:none;width:21px;height:21px;border-radius:50%;cursor:pointer;color:var(--text2);font-size:13px;line-height:21px;text-align:center;display:none;transition:background .15s}
+.clr:hover{background:var(--border-h)}
+.frow{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding-bottom:10px}
+.flbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.fsel{height:36px;border:1px solid var(--border);border-radius:20px;padding:0 12px 0 30px;font-family:"Heebo",sans-serif;font-size:13px;color:var(--text);background:var(--surface);cursor:pointer;outline:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A9A59E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:left 12px center;
+  transition:border-color .2s,background-color .2s,color .15s;min-width:122px;box-sizing:border-box;white-space:nowrap}
+.fsel:focus{border-color:var(--green-m)}
+.fsel.on{border-color:var(--green-m);background-color:var(--green-l);color:var(--green);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%230F6E56' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")}
+.msel{position:relative}
+.msel-panel{display:none;position:absolute;top:42px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.14);padding:6px;min-width:210px;max-height:270px;overflow-y:auto;z-index:150}
+.msel-panel.on{display:block}
+.msel-opt{display:flex;align-items:center;gap:8px;padding:7px 9px;font-size:13px;color:var(--text);cursor:pointer;border-radius:8px;line-height:1.4}
+.msel-opt:hover{background:var(--bg)}
+.msel-opt input{cursor:pointer;accent-color:var(--green-m);width:14px;height:14px;flex-shrink:0}
+.rst{height:36px;border:1px solid var(--border);border-radius:20px;padding:0 13px;font-family:"Heebo",sans-serif;font-size:12px;color:var(--muted);background:var(--surface);cursor:pointer;transition:all .2s;display:none;align-items:center;gap:4px}
+
+.hact{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-family:"Heebo",sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:all .15s}
+.hact:hover{border-color:var(--border-h);color:var(--text)}
+.hact.on{border-color:var(--green-m);background:var(--green-l);color:var(--green)}
+.hact-collab{border-color:#C9C4F5;background:var(--purple-l);color:var(--purple)}
+.hact-collab:hover{background:var(--purple);color:#fff;border-color:var(--purple)}
+.hact-collab.on{background:var(--purple);color:#fff;border-color:var(--purple)}
+.hact-domain{border-color:#F0C775;background:var(--amber-l);color:#854F0B}
+.hact-domain:hover{background:var(--amber);color:#fff;border-color:var(--amber)}
+.hact-domain.on{background:var(--amber);color:#fff;border-color:var(--amber)}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.dcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.dcard-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.dcard-t{font-size:14px;font-weight:700}
+.dcard-n{font-size:11px;color:var(--muted);background:var(--bg);border-radius:10px;padding:2px 9px}
+.dorg{display:inline-flex;align-items:center;background:var(--surface);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-size:12.5px;color:var(--text);cursor:pointer;margin:0 4px 4px 0;transition:all .15s}
+.dorg:hover{border-color:var(--green-m);background:var(--green-l);color:var(--green)}
+.back-lnk{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 16px;cursor:pointer;margin-bottom:16px;font-family:"Heebo",sans-serif;transition:all .15s}
+.back-lnk:hover{border-color:var(--green-m);color:var(--green);background:var(--green-l)}
+.cb-hero{text-align:center;padding:6px 6px 16px}
+.cb-title{font-size:19px;font-weight:800;margin-bottom:6px}
+.cb-sub{font-size:13px;color:var(--text2);line-height:1.6;max-width:520px;margin:0 auto}
+.otag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:10px;background:var(--green-l);color:var(--green);line-height:1.5}
+.c-updated{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.upd-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-bottom:16px}
+.rst.on{display:flex}
+.rst:hover{border-color:var(--border-h);color:var(--text)}
+.chips{display:none;flex-wrap:wrap;gap:5px;align-items:center;padding-bottom:11px}
+.chips.on{display:flex}
+.chips-lbl{font-size:11px;color:var(--muted);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--green-l);color:var(--green);border:1px solid #9FD9C8;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500}
+.chip-x{background:none;border:none;cursor:pointer;color:var(--green);font-size:15px;line-height:1;padding:0;opacity:.65;transition:opacity .15s}
+.chip-x:hover{opacity:1}
+.main{max-width:1100px;margin:0 auto;padding:24px 32px 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;cursor:pointer;transition:box-shadow .2s,transform .15s,border-color .2s;animation:up .22s ease both;display:flex;flex-direction:column;gap:11px;outline:none}
+.card:hover,.card:focus-visible{box-shadow:0 6px 28px rgba(0,0,0,.1);transform:translateY(-2px);border-color:var(--border-h)}
+.card:focus-visible{outline:2px solid var(--green-m);outline-offset:2px}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.c-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.c-org{font-size:16px;font-weight:700;line-height:1.3}
+.c-area{font-size:10px;font-weight:600;padding:3px 9px;border-radius:12px;background:var(--green-l);color:var(--green);white-space:nowrap;flex-shrink:0}
+.c-rep{font-size:12px;color:var(--text2)}
+.c-tags{display:flex;flex-wrap:wrap;gap:5px}
+.stag{font-size:11px;font-weight:500;padding:3px 9px;border-radius:10px;background:var(--purple-l);color:var(--purple);line-height:1.5}
+.c-sum{font-size:12.5px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-areas{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.c-area-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--green-l);color:var(--green);white-space:nowrap}
+.c-foot{border-top:1px solid var(--border);margin-top:auto;background:#EEEDFE;border-radius:0 0 var(--r-lg) var(--r-lg);padding:7px 14px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.c-aud-icon{width:13px;height:13px;color:#534AB7;flex-shrink:0;vertical-align:middle}
+.c-aud-tag{font-size:11px;padding:2px 8px;border-radius:20px;border:0.5px solid #AFA9EC;color:#534AB7;background:#f5f4ff}
+.c-arr{display:none}
+.empty{text-align:center;padding:72px 20px;display:none}
+.empty svg{opacity:.22;margin-bottom:14px}
+.empty p{font-size:15px;color:var(--text2);margin-bottom:14px}
+.empty-btn{background:var(--green);color:#fff;border:none;padding:10px 22px;border-radius:20px;font-family:"Heebo",sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.empty-btn:hover{opacity:.87}
+.ov{position:fixed;inset:0;background:rgba(20,18,14,.45);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(2px)}
+.ov.on{opacity:1;pointer-events:all}
+.modal{background:var(--surface);width:100%;max-width:600px;border-radius:20px 20px 0 0;padding:10px 28px 40px;transform:translateY(30px);transition:transform .28s cubic-bezier(.22,.68,0,1.2);max-height:90vh;overflow-y:auto;position:relative}
+.ov.on .modal{transform:translateY(0)}
+@media(min-width:640px){.ov{align-items:center;padding:20px}.modal{border-radius:16px;max-height:85vh}}
+.m-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:6px auto 18px}
+.m-close{position:absolute;top:14px;left:14px;width:30px;height:30px;border-radius:50%;border:none;background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:16px;transition:background .15s}
+.m-close:hover{background:var(--border)}
+.m-org{font-size:22px;font-weight:800;margin-bottom:4px}
+.m-rep{font-size:13px;color:var(--text2);margin-bottom:16px}
+.m-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.b-area{font-size:11px;font-weight:600;padding:4px 12px;border-radius:12px;background:var(--green-l);color:var(--green)}
+.b-svc{font-size:11px;font-weight:500;padding:4px 12px;border-radius:12px;background:var(--purple-l);color:var(--purple)}
+.msec{margin-bottom:14px}
+.msec-l{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px}
+.msec-v{font-size:14px;color:var(--text);line-height:1.65}
+.atags{display:flex;flex-wrap:wrap;gap:5px}
+.atag{font-size:12px;padding:4px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
+.divhr{height:1px;background:var(--border);margin:14px 0}
+.inds{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+.ind{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.d-y{background:var(--green-m)}.d-n{background:var(--border-h)}.d-p{background:var(--amber)}
+.contacts{display:flex;flex-direction:column;gap:8px}
+.crow{display:flex;align-items:center;gap:8px}
+.ci{width:16px;height:16px;color:var(--muted);flex-shrink:0}
+.cl{font-size:13px;color:var(--text2);text-decoration:none;direction:ltr;unicode-bidi:embed}
+.cl:hover{color:var(--green);text-decoration:underline}
+@media(max-width:600px){
+  .hdr{padding:0 14px}.main{padding:18px 14px 40px}
+  .grid{grid-template-columns:1fr}
+  .fsel{min-width:100px;font-size:12px}.frow{gap:5px}
+  .brand img{height:32px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+ <div class="hdr-inner">
+  <div class="hdr-top">
+   <div class="brand">
+    <img src="data:image/avif;base64,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" alt="פורום נראות">
+    <div class="brand-sep"></div>
+    <span class="brand-lbl">מאגר ארגוני הפורום</span>
+   </div>
+   <div class="count-pill" id="pill">37 ארגונים</div>
+   <a class="hact" href="https://docs.google.com/forms/d/e/1FAIpQLSezdDcSEU1ch6_IjbprdvqzR3b4vCfnMbUZRXc3dKGi9OoZCg/viewform?usp=dialog" target="_blank" rel="noopener">📝 עדכון פרטים</a>
+   <button type="button" class="hact hact-collab" id="collab-btn" onclick="switchView('collab')">🤝 שיתופי פעולה</button>
+   <button type="button" class="hact hact-domain" id="domain-btn" onclick="switchView('domain')">🗺️ מפת תחומים</button>
+  </div>
+
+  <div id="searchControls">
+
+  <div class="tip">
+   <span style="font-size:15px;flex-shrink:0;margin-top:1px">&#128161;</span>
+   <div><strong>טיפ לשימוש:</strong> ניתן לשלב מספר מסננים יחד. לפני כל שינוי גדול &#8212; מומלץ ללחוץ <strong>"נקה הכל"</strong> כדי להתחיל חיפוש חדש ולמנוע סינון כפול.</div>
+  </div>
+
+  <div class="sw">
+   <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+   <input class="search" type="text" id="q" placeholder="חיפוש חופשי &#8212; שם ארגון, מענה, קהל יעד, נציג..." autocomplete="off">
+   <button class="clr" id="clr" onclick="clearQ()">&#215;</button>
+  </div>
+
+  <div class="frow">
+   <span class="flbl">סנן לפי:</span>
+   <div class="msel" id="mOrg">
+    <button type="button" class="fsel" id="fOrg-btn" onclick="toggleMsel('Org')">כל הארגונים</button>
+    <div class="msel-panel" id="fOrg-panel"></div>
+   </div>
+   <div class="msel" id="mSvc">
+    <button type="button" class="fsel" id="fSvc-btn" onclick="toggleMsel('Svc')">כל המענים</button>
+    <div class="msel-panel" id="fSvc-panel"></div>
+   </div>
+   <div class="msel" id="mAud">
+    <button type="button" class="fsel" id="fAud-btn" onclick="toggleMsel('Aud')">כל קהלי היעד</button>
+    <div class="msel-panel" id="fAud-panel"></div>
+   </div>
+   <div class="msel" id="mArea">
+    <button type="button" class="fsel" id="fArea-btn" onclick="toggleMsel('Area')">כל האזורים</button>
+    <div class="msel-panel" id="fArea-panel"></div>
+   </div>
+   <button class="rst" id="rst" onclick="reset()">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    נקה הכל
+   </button>
+  </div>
+
+  <div class="chips" id="chips"><span class="chips-lbl">מסננים פעילים:</span></div>
+  </div>
+
+  <div id="collabControls" style="display:none">
+   <div class="cb-hero">
+    <button type="button" class="back-lnk" onclick="switchView('search')">
+     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+     חזרה למאגר הראשי
+    </button>
+    <div class="cb-title">שיתופי פעולה בין ארגונים</div>
+    <div class="cb-sub">מחפשים ידע מקצועי, הכשרה, חלל לפעילות או שותף לפרויקט? כאן תוכלו למצוא מה ארגוני הפורום מציעים זה לזה.</div>
+   </div>
+
+   <div class="sw">
+    <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search" type="text" id="cq" placeholder="חיפוש חופשי &#8212; שם ארגון, סוג הצעה..." autocomplete="off">
+    <button class="clr" id="cclr" onclick="clearCQ()">&#215;</button>
+   </div>
+
+   <div class="frow">
+    <span class="flbl">סנן לפי:</span>
+    <div class="msel" id="mCOffer">
+     <button type="button" class="fsel" id="fCOffer-btn" onclick="toggleMselC('COffer')">כל סוגי ההצעה</button>
+     <div class="msel-panel" id="fCOffer-panel"></div>
+    </div>
+    <div class="msel" id="mCFormat">
+     <button type="button" class="fsel" id="fCFormat-btn" onclick="toggleMselC('CFormat')">כל המתכונות</button>
+     <div class="msel-panel" id="fCFormat-panel"></div>
+    </div>
+    <div class="msel" id="mCCost">
+     <button type="button" class="fsel" id="fCCost-btn" onclick="toggleMselC('CCost')">כל רמות העלות</button>
+     <div class="msel-panel" id="fCCost-panel"></div>
+    </div>
+    <button class="rst" id="crst" onclick="resetC()">
+     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+     נקה הכל
+    </button>
+   </div>
+
+   <div class="chips" id="cchips"><span class="chips-lbl">מסננים פעילים:</span></div>
+  </div>
+
+  <div id="domainControls" style="display:none">
+   <div class="cb-hero">
+    <button type="button" class="back-lnk" onclick="switchView('search')">
+     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+     חזרה למאגר הראשי
+    </button>
+    <div class="cb-title">מפת תחומים</div>
+    <div class="cb-sub">כל הארגונים מקובצים לפי קהלי היעד האמיתיים שלהם, בדיוק כפי שמופיע בכרטיס שלהם. ארגון שמשרת כמה קהלים יופיע בכמה קבוצות. לחיצה על שם ארגון פותחת את הכרטיס המלא שלו.</div>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="main">
+ <div id="searchMain">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">
+   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+   <p>לא נמצאו ארגונים תואמים לחיפוש</p>
+   <button class="empty-btn" onclick="reset()">אפס את כל המסננים</button>
+  </div>
+ </div>
+ <div id="collabMain" style="display:none">
+  <div class="grid" id="cgrid"></div>
+  <div class="empty" id="cempty">
+   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+   <p>לא נמצאו הצעות תואמות לחיפוש</p>
+   <button class="empty-btn" onclick="resetC()">אפס את כל המסננים</button>
+  </div>
+ </div>
+ <div id="domainMain" style="display:none">
+  <div class="dgrid" id="dgrid"></div>
+ </div>
+</div>
+
+
+<div class="ov" id="ov" onclick="closeM(event)">
+ <div class="modal">
+  <button class="m-close" onclick="closeM(null)">&#215;</button>
+  <div class="m-handle"></div>
+  <div id="mc"></div>
+ </div>
+</div>
+
+<script>
+var DATA = [{"org": "א.ס.ף - ארגון סיוע לפליטים ומבקשי מקלט בישראל", "rep": "צמרת הרשקו", "phone": "054-2900244", "email": "zameret@assaf.org.il", "area": "ארצי, תל אביב, דיגיטלי", "over26": "כן", "mothers": "כן", "service": "ליווי כללי, מיצוי זכויות, מרחב חברתי", "audience": "מבקשי מקלט", "details": "סיוע לפליטים ומבקשי מקלט; ליווי פרטני במחלקה פסיכו-סוציאלית", "website": "https://assaf.org.il/he/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "אג'יאל", "rep": "מייסון אגבאריה", "phone": "052-5352609", "email": "mysone@ajyal.org.il", "area": "ארצי, צפון, המשולש, מרכז, דרום", "over26": "כן", "mothers": "כן", "service": "השכלה, תכנית מנהיגות, תעסוקה", "audience": "החברה הערבית", "details": "מכינות שנת מעבר אזוריים (צפון, דרום ומרכז)", "website": "https://hashomer-hatzair.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "אג'יק", "rep": "הדיל אבו רביעה", "phone": "053-9231987", "email": "Hadeel@n-a.org.il", "area": "המשולש, דרום, מרכז, ירושלים, צפון", "over26": "כן", "mothers": "כן", "service": "השכלה, תעסוקה, תכנית מנהיגות", "audience": "החברה הערבית", "details": "מכינות שנת מעבר, תוכניות תעסוקה, אקטיביזם, מנהיגות, הכנה לאקדמיה והייטק", "website": "https://ajeec-nisped.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "אור שלום", "rep": "לירון לוי הרשקוביץ", "phone": "052-4325439", "email": "lironl@shalom-orr.co.il", "area": "מרכז, דרום, ירושלים", "over26": "לא", "mothers": "כן", "service": "תכנית בוגרים, דיור, תכנית מעטפת", "audience": "בוגרי מסגרות חוץ ביתיות, צעירות אמהות", "details": "עמותת \"אור שלום\" מפעילה את תוכנית הבוגרים (גילאי 18–26) עבור צעירים וצעירות ללא עורף משפחתי. העמותה מעניקה להם מעטפת תמיכה הכוללת ליווי אישי ורגשי של אנשי מקצוע בכל תחומי החיים. התוכנית מספקת פתרונות דיור מוגן ודירות שותפים בקהילה במסגרת פרויקט \"גשר לעצמאות\". הצעירים מקבלים הכוונה תעסוקתית, סיוע בלימודים אקדמיים, מלגות וכלים להתנהלות כלכלית. בנוסף, קיים מסלול ייעודי (\"אם הדרך\") המעניק קורת גג וליווי מקצועי לאימהות צעירות בסיכון.", "website": "https://orr-shalom.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הרצאות"], "format": "", "cost": "ללא עלות", "note": "הרצאה לצוותים על הבגרות המתהווה אצל צעירים חסרי עורף משפחתי יוצאי פנימיות / חשיבות הרצף של מתבגרים-בוגרים והחזקת העובד", "contact": "לירון לוי הרשקוביץ, 052-432-5439"}, {"tags": ["ייעוץ מקצועי", "שיתוף ידע", "הרצאות"], "format": "", "cost": "ללא עלות", "note": "ייעוצי קריירה לצעירים בסיכון ומאמר כתוב בנושא; מאמר על סוגי מנטורינג וחשיבותו אצל צעירים נעדרי עורף משפחתי; הרצאה \"השכלה גבוהה אצל צעירים במצבי סיכון: כיצד לתמוך בצעירים בתהליכי החשיפה להשכלה ולאורך הלימודים\"", "contact": "לירון לוי הרשקוביץ, 052-432-5439"}]}, {"org": "אותות", "rep": "נוי עזורי", "phone": "054-6747990", "email": "noyvezeke@gmail.com", "area": "צפון, מרכז, דרום, ירושלים", "over26": "כן", "mothers": "כן", "service": "דיור, חירום, תכנית מעטפת, ליווי כללי", "audience": "להטב, קצה רצף הסיכון, חירום, דרי רחוב", "details": "הלנת חירום (הגג הוורוד), הוסטלים, דירות מעבר ומעני להטב", "website": "https://otot.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הרצאות"], "format": "", "cost": "ללא עלות", "note": "הרצאות לצוותים המלווים צעירות וצעירים בארגוני הפורום בכמה תחומים: טיפול מוסדי מוכוון טראומה; מענים חירומיים חוץ ביתיים לבני נוער במצבי סיכון ומשבר; בתחום הלהט\"ב - תהליכי שינוי מגדרי, מאפייני וצרכי האוכלוסייה, פרקטיקות עבודה עם טראנס; הדרכה וליווי להורים למתבגרים במצבי סיכון ומשבר", "contact": "יואב, 052-877-3321"}]}, {"org": "אל הלב", "rep": "איה נצר", "phone": "054-9920490", "email": "aya@elhalev.org", "area": "ארצי", "over26": "כן", "mothers": "כן", "service": "הכשרות", "audience": "צעירות, אנשי צוות", "details": "הכשרות, סדנאות וקורסים להעצמה ומניעת אלימות", "website": "https://www.elhalev.org", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "בת עמי", "rep": "ימית דלל", "phone": "052-8119923", "email": "yamitd@bat-ami.org.il", "area": "צפון, מרכז, ירושלים, שפלה, דרום", "over26": "לא", "mothers": "לא", "service": "הכנה לשירות, שירות לאומי, תכנית בוגרים", "audience": "שירות לאומי", "details": "תוכניות צלש, בדרכי, וליווי בוגרי שירות לאומי", "website": "https://bat-ami.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "בית רות", "rep": "יעל אלטמן", "phone": "052-5500288", "email": "yael.a@beitruth.com", "area": "צפון, ארצי", "over26": "כן", "mothers": "כן", "service": "ליווי כללי, תכנית בוגרות", "audience": "צעירות, בוגרות בית רות", "details": "תוכנית הבוגרות – ליווי צעירות בוגרות המסגרת בכל הארץ", "website": "https://www.beitruth.co.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הרצאות"], "format": "", "cost": "ללא עלות", "note": "הרצאות לצוותים בתחום אלימות בזוגיות, טראומה מורכבת, התעללות בילדות", "contact": "יעל אלטמן, 052-550-0288"}, {"tags": ["הרצאות"], "format": "", "cost": "ללא עלות", "note": "הרצאות בנושא מניעת אלימות בזוגיות בקרב צעירים וצעירות בסיכון (מעגל האלימות, זיהוי נורות אדומות, דרכי התערבות, פרידה בטוחה ועוד)", "contact": "יעל אלטמן, 052-550-0288"}]}, {"org": "האגודה להתנדבות", "rep": "זוהר לביא", "phone": "054-8030284", "email": "zohar@sherut-leumi.co.il", "area": "צפון, מרכז, ירושלים, דרום, שפלה", "over26": "לא", "mothers": "חלקי", "service": "שירות לאומי, תכנית בוגרים", "audience": "שירות לאומי", "details": "שירות לאומי מותאם (תמורה, עטרה, מסאראת) לצעירים בסיכון", "website": "https://sherut-leumi.co.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "החוט המשולש", "rep": "תרזה וטורי", "phone": "050-3377039", "email": "Tirza@meshulash.org", "area": "ירושלים", "over26": "לא", "mothers": "לא", "service": "חירום, דיור, תכנית מעטפת", "audience": "קצה רצף הסיכון, רצף הזנות, דרי רחוב, התמכרויות, נפגעי טראומה, חירום", "details": "מרחב פתוח, הלנות חירום, הוסטלים, דירות מעבר ותעסוקה", "website": "https://meshulash.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["ייעוץ מקצועי", "הכשרות"], "format": "", "cost": "ללא עלות", "note": "ייעוץ בנושא תכניות עבודה – \"תכנית הרמזור\"; הכשרות פנים ארגוניות בנושאים שונים", "contact": "אביתר, 054-2295484"}]}, {"org": "החצר הנשית", "rep": "פז ארמה", "phone": "052-3571244", "email": "paza@hatzer.org.il", "area": "חיפה, השרון", "over26": "לא", "mothers": "כן", "service": "מרחב חברתי, ליווי כללי", "audience": "החברה הערבית, חסרי/ות עורף משפחתי, להט\"בק, מבקשי/ות מקלט, נפגעי/ות טראומה, צעירות, רצף הזנות", "details": "החצר הנשית מלווה נערות וצעירות חסרות עורף משפחתי דרך הפעלת מרחבים בלתי פורמליים בקהילה המציעים סיוע קונקרטי, רגשי, מענה חברתי, מיצוי זכויות, קידום השכלה ותעסוקה ועוד", "website": "https://www.hatzer.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "הלל", "rep": "מתן סגל", "phone": "052-6220802", "email": "matans@hillel.org.il", "area": "תל אביב, ירושלים, דרום, מרכז, צפון", "over26": "כן", "mothers": "כן", "service": "דיור, חירום, ליווי כללי, תכנית מעטפת, מרחב חברתי", "audience": "בוגרי החינוך החרדי, חיילים בודדים, יוצאים בשאלה, חיילים", "details": "דיור, טיפול רגשי, ייעוץ משפטי וכלכלי, ליווי והשכלה ליוצאים בשאלה", "website": "https://hillel.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הרצאות"], "format": "", "cost": "ללא עלות", "note": "הרצאה לצוותים על מאפיינים של יוצאים בשאלה מהקהילה החרדית", "contact": "עדי, 054-684-5434"}]}, {"org": "המרכז הישראלי להתמכרויות ובריאות הנפש", "rep": "מאיה חסיד", "phone": "052-8674675", "email": "Mayah@ica.org.il", "area": "ארצי", "over26": "כן", "mothers": "כן", "service": "הכשרות", "audience": "אנשי צוות, נפגעי טראומה, התמכרויות", "details": "הכשרות לקו ראשון, מרפאה ניידת (מעגל), וליווי פוסט-טראומה", "website": "https://www.ica.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "הסוכנות היהודית", "rep": "שירי אלרז", "phone": "052-6985934", "email": "shiriel@jafi.org", "area": "צפון, חיפה, מרכז, ירושלים, השרון, שפלה", "over26": "לא", "mothers": "חלקי", "service": "מנטורינג, תכנית מעטפת", "audience": "עולים, בוגרי מסגרות חוץ ביתיות, תכנית בוגרים", "details": "תוכנית מנטורים המלווים נוער וצעירים בסיכון גילאי 17-24", "website": "https://www.jewishagency.org/he", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "התנועה הקיבוצית", "rep": "אילת ארנוני", "phone": "050-9005466", "email": "ayeleta@tkz.co.il", "area": "צפון, דרום, מרכז, שפלה, השרון", "over26": "לא", "mothers": "לא", "service": "דיור, תעסוקה, קהילה, ליווי כללי", "audience": "חיילים בודדים, בוגרי מסגרות חוץ ביתיות, חיילים משוחררים, חיילים", "details": "תוכנית תלמ (תעסוקה, לימודים, מגורים) לגילאי 18-25; אימוץ בקיבוץ לחיילים בודדים", "website": "https://www.tkz.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "יוצאים לשינוי", "rep": "מתן אסולין", "phone": "054-5617212", "email": "Matana@leshinuy.org", "area": "ירושלים, תל אביב, חיפה, דרום, צפון, דיגיטלי", "over26": "כן", "mothers": "כן", "service": "מרחב חברתי, השכלה, מנטורינג, תעסוקה", "audience": "בוגרי החינוך החרדי, יוצאים בשאלה", "details": "מרכזי קהילה, השלמת השכלה, ליווי תעסוקתי ומנטורינג", "website": "https://leshinuy.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "יחדיו", "rep": "גלית כהן", "phone": "052-4374461", "email": "Galitco@Yachdav.org.il", "area": "דרום, מרכז, שפלה", "over26": "כן", "mothers": "כן", "service": "דיור, ליווי כלכלי, ליווי כללי, תכנית מעטפת", "audience": "צעירות אמהות, חסרי עורף משפחתי, חיילים משוחררים, חובות", "details": "ליווי כלכלי (חובות), דיור לחיילים משוחררים, ותוכניות לאימהות", "website": "https://www.yachdav.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "ילדים בסיכוי", "rep": "נעמית שלמה", "phone": "052-2336750", "email": "Naamits@yeladim.org.il", "area": "צפון, חיפה, מרכז, תל אביב, שפלה, ירושלים, דרום", "over26": "כן", "mothers": "כן", "service": "תכנית בוגרים, דיור, תכנית מעטפת, ליווי כללי, הכנה לשירות", "audience": "בוגרי מסגרות חוץ ביתיות, צעירות אמהות", "details": "גשר לעצמאות, מלווי הדרך, תעסוקה ופורום מנהיגות", "website": "https://yeladim.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "יעדים לצפון", "rep": "דוניא סאקס", "phone": "054-6678701", "email": "Doniasa@yeadim.org", "area": "צפון, חיפה", "over26": "לא צוין", "mothers": "לא צוין", "service": "תעסוקה, השכלה", "audience": "החברה הערבית", "details": "ליווי לתעסוקה והשכלה וקידום צעירים באזור הצפון", "website": "https://yeadim.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "לדעת לבחור נכון", "rep": "דינה שלו", "phone": "054-4741564", "email": "ladaat@ladaat.org.il", "area": "ארצי", "over26": "כן", "mothers": "כן", "service": "הכשרות, מיניות, בריאות מינית", "audience": "צעירות, אנשי צוות, הריון", "details": "ייעוץ בנושא מיניות, מניעת היריון, סדנאות והדרכות לאנשי מקצוע", "website": "https://ladaat.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "למרחב", "rep": "ניקי לוי", "phone": "058-6734507", "email": "niki@lamerhav.co.il", "area": "השרון, מרכז, דרום", "over26": "כן", "mothers": "כן", "service": "ליווי כללי, מרחב חברתי, תכנית מעטפת", "audience": "חסרי עורף משפחתי, בוגרי מסגרות חוץ ביתיות, חיילים משוחררים", "details": "ליווי צעירים חסרי עורף משפחתי בגילאי 21-30", "website": "https://www.lamerhav.co.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["חלל לפעילות", "חדר ישיבות"], "format": "", "cost": "הנחה של 40%", "note": "חדרי פגישות, סדנאות, ישיבות ואולם בבית למרחב הוד השרון", "contact": "נועם עמר, 050-8727791"}]}, {"org": "המרכז לחיילים בודדים לזכרו של מייקל לוין", "rep": "עמית טנדלר", "phone": "052-6650642", "email": "amitt@lsc.org.il", "area": "ירושלים, תל אביב, דרום", "over26": "לא", "mothers": "לא", "service": "ליווי כללי, מנטורינג, מרחב חברתי, תכנית מעטפת, שירות צבאי", "audience": "חיילים בודדים, חיילים בודדים משוחררים, חיילים", "details": "ליווי חיילים בודדים (צמרת), ייעוץ לימודים ומלגות", "website": "https://lonesoldiercenter.com/he/home/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "מצמצמים רווחים", "rep": "אדוה לוי", "phone": "054-5635242", "email": "adva@closing-ranks.org", "area": "צפון, מרכז, שפלה, שרון, דרום, ירושלים", "over26": "כן", "mothers": "כן", "service": "מנטורינג, השכלה", "audience": "חיילים משוחררים, חסרי עורף משפחתי", "details": "ליווי משוחררים על ידי מנטורים מתנדבים", "website": "https://www.closing-ranks.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "מקום", "rep": "איריס זילכה", "phone": "050-3398856", "email": "iris.mzilka@gmail.com", "area": "תל אביב-יפו, מרכז", "over26": "כן", "mothers": "כן", "service": "דיור, תכנית מעטפת, ליווי כללי", "audience": "צעירות, צעירות אמהות", "details": "לביאות (ליווי לאימהות וילדיהן), ודירות לצעירות חסרות עורף", "website": "https://www.facebook.com/AmutatMakom/?locale=he_IL", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "מתייצבים אל הדגל", "rep": "מיכאל רבר", "phone": "054-7270567", "email": "michael@mlh.org.il", "area": "ירושלים, צפון, מרכז, תל אביב, דרום", "over26": "כן", "mothers": "כן", "service": "ליווי כללי, הכנה לשירות, שירות צבאי", "audience": "בוגרי החינוך החרדי, חיילים", "details": "ליווי בוגרי חינוך חרדי למיצוי פוטנציאל בשירות הצבאי", "website": "https://mlh.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "נצח יהודה", "rep": "שעיה שושן", "phone": "050-9202227", "email": "shaia@netzahyehuda.org", "area": "תל אביב-יפו, מרכז, ירושלים, דרום, צפון", "over26": "כן", "mothers": "כן", "service": "ליווי כללי, הכנה לשירות, שירות צבאי", "audience": "בוגרי החינוך החרדי, חיילים", "details": "מעטפת לצעירים חרדים בצבא, הכנה קדם צבאית וסיוע באזרחות", "website": "https://netzahyehuda.org/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "עש אהרן שנדור", "rep": "גלית בן יאיר", "phone": "054-7545317", "email": "galit@shandor.org.il", "area": "ארצי", "over26": "לא צוין", "mothers": "לא צוין", "service": "ליווי כללי", "audience": "חסרי עורף משפחתי, חיילים משוחררים", "details": "ליווי וסיוע לצעירים", "website": "https://www.shindor.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["שותפות לפרויקט", "חדר ישיבות"], "format": "", "cost": "ללא עלות", "note": "רישום לפרויקט \"הכוון\" – תוכנית הכוללת הענקת מלגות סיוע עבור לימודים בהשכלה גבוהה ולימודים מקצועיים במסגרות השונות, יחד עם ליווי הצעירים. בנוסף, שימוש במרחב העמותה במעלה אדומים (חדר ישיבות ופינות עבודה)", "contact": "גלית בן יאיר, 054-754-5317"}, {"tags": ["שיתוף ידע"], "format": "", "cost": "ללא עלות", "note": "פ. דירת בוגרות – דיור, ליווי והכנה לחיים עצמאיים עבור צעירות בסיכון מגיל 18 שסיימו מסגרות חוץ ביתיות ומתפקדות באופן עצמאי", "contact": "גלית בן יאיר, 054-754-5317"}]}, {"org": "עלם", "rep": "אלה גלעדי", "phone": "054-9299551", "email": "giladi.ella@elem.org.il", "area": "שרון, שפלה, צפון, ירושלים, מרכז, דרום, תל אביב, חיפה, דיגיטלי", "over26": "לא", "mothers": "כן", "service": "ליווי כללי, דיור, חירום, הכשרות, תכנית מעטפת", "audience": "צעירות אמהות, חסרי עורף משפחתי, קצה רצף הסיכון, חירום, נפגעי טראומה, רצף הזנות, החברה הערבית", "details": "מרכזי הלב, גלגל, בית אמיתי – מענים לצעירים במצבי סיכון וטראומה", "website": "https://www.elem.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הכשרות"], "format": "", "cost": "750 ₪ במקום 2,000 ₪ לארגוני הפורום", "note": "הכשרות לצוותים (מפגש הכשרה חד פעמי) על עקרונות בעבודה במסגרת קצה וכל מה שקשור לפגיעות מיניות וקשר טיפולי רלוונטי; ניתן להתאים לצרכי הארגון. פרטים נוספים באתר עלם", "contact": "צליל שילדר, 054-977-3868"}]}, {"org": "עמינדב", "rep": "שיר דאדון", "phone": "055-6884285", "email": "shirdadon@aminadav.org.il", "area": "ירושלים, צפון, מרכז, דרום, שרון, שפלה", "over26": "לא", "mothers": "לא", "service": "שירות לאומי, תכנית בוגרים", "audience": "שירות לאומי", "details": "תוכנית דניאלי (שירות לאומי תעסוקתי), מערך דיור ותוכנית מגשימים", "website": "https://www.aminadav.org.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "עמית לדרך", "rep": "שלי לרנר", "phone": "050-8884458", "email": "shelly@amitladerech.org", "area": "שרון, צפון, חיפה, שפלה, תל אביב, מרכז, דרום", "over26": "כן", "mothers": "כן", "service": "מנטורינג, מרחב חברתי, השכלה, תעסוקה", "audience": "חיילים משוחררים, חסרי עורף משפחתי", "details": "ליווי משוחררים, מניעת נשירה בצבא ותוכנית סטארטליין", "website": "https://www.amitladerech.org", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["שיתוף ידע"], "format": "", "cost": "ללא עלות", "note": "עבודה עם מתנדבים ומנטורינג", "contact": "הדס אוריאלי, 054-3181432"}]}, {"org": "פעמונים", "rep": "דנה גניש", "phone": "052-9555603", "email": "danag@paamonim.org", "area": "ארצי", "over26": "כן", "mothers": "כן", "service": "ליווי כלכלי, הכשרות", "audience": "אנשי צוות, חובות, חסרי עורף משפחתי", "details": "תוכנית תכלס – ליווי כלכלי וסדנאות לצעירים בסיכון", "website": "https://www.paamonim.org", "offer": "", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הכשרות"], "format": "", "cost": "450 ₪ לשעה", "note": "סדנאות לצוותים וצעירים להתנהלות כלכלית נבונה", "contact": "דנה גניש, 052-955-5603"}, {"tags": ["ייעוץ מקצועי"], "format": "", "cost": "ללא עלות", "note": "ליווי פרטני לצעירים.ות", "contact": "דנה גניש, 052-955-5603"}]}, {"org": "פרויקט גילה להעצמה טרנסית", "rep": "אור רם", "phone": "054-7110815", "email": "cfo@gilaproject.org", "area": "ארצי, דיגיטלי, תל אביב-יפו, חיפה", "over26": "כן", "mothers": "כן", "service": "ייעוץ משפטי, מרחב חברתי, ליווי כללי", "audience": "להטב", "details": "פרויקט גילה להעצמה טרנסית הוא הארגון הטרנסי הותיק בארץ. ב-16 השנים האחרונות אנחנו פועלות לקידום זכויות הקהילה הטרנסית מול קובעי מדיניות, נותני שירותים ופועלות לחיזוק הקהילה עצמה.", "website": "https://www.gilaproject.org/", "offer": "יכולות להציע הכשרות בעלות מסובסדת לצוותים מקצועיים, ייעוץ בכתיבת נהלים והטמעת נהלים רגישי מגדר, הכוונה וסיוע פרטניים, חיבור לשירותים רלוונטיים בקהילה", "lastUpdated": "06.08.2026", "collab": [{"tags": ["הכשרות", "ייעוץ מקצועי", "שיתוף ידע"], "format": "", "cost": "עלות סמלית", "note": "הכשרות בעלות מסובסדת לצוותים מקצועיים, ייעוץ בכתיבת נהלים והטמעת נהלים רגישי מגדר, הכוונה וסיוע פרטניים, חיבור לשירותים רלוונטיים בקהילה"}]}, {"org": "צמאון", "rep": "גרנית שטוקמן", "phone": "054-6556616", "email": "Granitstockman66@gmail.com", "area": "מרכז", "over26": "כן", "mothers": "כן", "service": "השכלה, ליווי כללי, הכנה לשירות, תכנית מעטפת", "audience": "חיילים משוחררים, חסרי עורף משפחתי", "details": "מכינת מפנה, תוכנית מפנה לעתיד הכוללת דיור ומנטור", "website": "https://www.tzimaon.co.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "קליניקות משפטיות (אוני עברית)", "rep": "אור בצלאל", "phone": "052-5393002", "email": "or.bezalel@mail.huji.ac.il", "area": "ירושלים", "over26": "כן", "mothers": "כן", "service": "ייעוץ משפטי", "audience": "כללי", "details": "סיוע משפטי לזכויות נוער וצעירים במצבי סיכון", "website": "https://law.huji.ac.il", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "רוח נכונה", "rep": "עינת אהרון", "phone": "052-5647700", "email": "volunteers@r-n.org.il", "area": "שרון, שפלה, צפון, מרכז, דרום, דיגיטלי", "over26": "כן", "mothers": "כן", "service": "מנטורינג, מרחב חברתי, ליווי כללי, דיור, תכנית מעטפת", "audience": "חיילים בודדים, חיילים בודדים משוחררים, חיילים", "details": "דיור לחיילים ומשוחררים בודדים, מלגות, וסיוע נפשי", "website": "https://ruachnechona.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "SOS כפרי ילדים", "rep": "רינה פיניאן", "phone": "052-5383639", "email": "rina.pinyan@soschildren.org.il", "area": "דרום, תל אביב, שרון, מרכז", "over26": "לא", "mothers": "לא", "service": "תכנית בוגרים, דיור, תכנית מעטפת, ליווי כללי", "audience": "בוגרי מסגרות חוץ ביתיות, חסרי עורף משפחתי, צעירות, בוגרי החינוך החרדי", "details": "תוכנית גשר לעצמאות – דיור וליווי לבוגרי מסגרות חוץ ביתיות", "website": "https://www.soschildren.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}, {"org": "ש\"ל - שילה", "rep": "אורטל חלפון", "phone": "054-2131514", "email": "ortal.halfon83@gmail.com", "area": "ארצי", "over26": "לא", "mothers": "לא", "service": "ליווי כללי, הכשרות מקצועיות, מרחב חברתי", "audience": "צעירות", "details": "עמותת ש\"ל-שילה היא גוף מוכר המלווה צעירות בתהליך השירות הלאומי-אזרחי במגוון תפקידי חינוך, בריאות וביטחון. העמותה מעניקה לצעירות מעטפת תמיכה והכוונה רוחנית, הכשרות מקצועיות, ליווי אישי של רכזות ודירות שירות המותאמות לאורח חייהן.", "website": "https://slo.org.il/", "offer": "", "lastUpdated": "06.08.2026", "collab": []}];
+
+function sp(s){if(!s||s==="—"||s==="לא צוין")return[];return s.split(",").map(function(x){return x.trim()}).filter(Boolean)}
+function uniq(a){var seen={};return a.filter(function(v){if(!v||seen[v])return false;seen[v]=true;return true}).sort(function(a,b){return a.localeCompare(b,"he")})}
+function g(id){return document.getElementById(id)}
+
+var FILTS={Org:{lbl:"ארגון",all:"כל הארגונים"},Svc:{lbl:"מענה",all:"כל המענים"},Aud:{lbl:"קהל",all:"כל קהלי היעד"},Area:{lbl:"אזור",all:"כל האזורים"}};
+var selected={Org:[],Svc:[],Aud:[],Area:[]};
+
+function buildMsel(key,arr){
+  var panel=g("f"+key+"-panel");
+  panel.innerHTML="";
+  arr.forEach(function(v){
+    var lbl=document.createElement("label");
+    lbl.className="msel-opt";
+    var cb=document.createElement("input");
+    cb.type="checkbox";cb.value=v;
+    cb.addEventListener("change",function(){toggleVal(key,v,cb.checked)});
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(v));
+    panel.appendChild(lbl);
+  });
+}
+
+function toggleVal(key,v,checked){
+  var arr=selected[key];
+  var i=arr.indexOf(v);
+  if(checked&&i<0)arr.push(v);
+  if(!checked&&i>=0)arr.splice(i,1);
+  updateBtnLabel(key);
+  go();
+}
+
+function updateBtnLabel(key){
+  var btn=g("f"+key+"-btn");
+  var arr=selected[key];
+  if(arr.length===0)btn.textContent=FILTS[key].all;
+  else if(arr.length===1)btn.textContent=arr[0];
+  else btn.textContent=arr.length+" נבחרו";
+  btn.classList.toggle("on",arr.length>0);
+}
+
+function toggleMsel(key){
+  var panel=g("f"+key+"-panel");
+  var isOpen=panel.classList.contains("on");
+  closeAllMsel();
+  if(!isOpen)panel.classList.add("on");
+}
+function closeAllMsel(){
+  ["Org","Svc","Aud","Area"].forEach(function(k){g("f"+k+"-panel").classList.remove("on")});
+}
+document.addEventListener("click",function(e){
+  if(!e.target.closest(".msel"))closeAllMsel();
+});
+
+buildMsel("Org", uniq(DATA.map(function(d){return d.org})));
+buildMsel("Svc", uniq(DATA.reduce(function(a,d){return a.concat(sp(d.service))},[])));
+buildMsel("Aud", uniq(DATA.reduce(function(a,d){return a.concat(sp(d.audience))},[])));
+buildMsel("Area",uniq(DATA.reduce(function(a,d){return a.concat(sp(d.area))},[])));
+
+g("q").addEventListener("input",function(){
+  g("clr").style.display=g("q").value?"block":"none";
+  go();
+});
+
+function clearQ(){g("q").value="";g("clr").style.display="none";go()}
+
+function go(){
+  var q=g("q").value.trim().toLowerCase();
+  var org=selected.Org,svc=selected.Svc,aud=selected.Aud,area=selected.Area;
+  var hasF=!!(q||org.length||svc.length||aud.length||area.length);
+  g("rst").classList.toggle("on",hasF);
+  updateChips(q,org,svc,aud,area);
+  var res=DATA.filter(function(d){
+    if(org.length&&org.indexOf(d.org)<0)return false;
+    if(svc.length&&!svc.some(function(v){return sp(d.service).indexOf(v)>=0}))return false;
+    if(aud.length&&!aud.some(function(v){return sp(d.audience).indexOf(v)>=0}))return false;
+    if(area.length&&!area.some(function(v){return sp(d.area).indexOf(v)>=0}))return false;
+    if(q){
+      var b=[d.org,d.rep,d.audience,d.service,d.details,d.area].join(" ").toLowerCase();
+      if(b.indexOf(q)<0)return false;
+    }
+    return true;
+  });
+  render(res);
+  g("pill").textContent=res.length+" ארגונים";
+  g("empty").style.display=res.length===0?"block":"none";
+}
+
+function uncheckOpt(key,val){
+  var panel=g("f"+key+"-panel");
+  var cbs=panel.querySelectorAll("input");
+  for(var i=0;i<cbs.length;i++){if(cbs[i].value===val){cbs[i].checked=false;break}}
+}
+
+function updateChips(q,org,svc,aud,area){
+  var c=g("chips");
+  var items=[];
+  if(q)items.push({l:"חיפוש: "+q,key:"q",val:null});
+  org.forEach(function(v){items.push({l:"ארגון: "+v,key:"Org",val:v})});
+  svc.forEach(function(v){items.push({l:"מענה: "+v,key:"Svc",val:v})});
+  aud.forEach(function(v){items.push({l:"קהל: "+v,key:"Aud",val:v})});
+  area.forEach(function(v){items.push({l:"אזור: "+v,key:"Area",val:v})});
+  if(!items.length){c.classList.remove("on");return}
+  c.classList.add("on");
+  c.innerHTML="<span class='chips-lbl'>מסננים פעילים:</span>";
+  items.forEach(function(item){
+    var ch=document.createElement("span");
+    ch.className="chip";
+    var btn=document.createElement("button");
+    btn.className="chip-x";
+    btn.textContent="×";
+    btn.onclick=function(){
+      if(item.key==="q"){clearQ();return}
+      var arr=selected[item.key];
+      var i=arr.indexOf(item.val);
+      if(i>=0)arr.splice(i,1);
+      uncheckOpt(item.key,item.val);
+      updateBtnLabel(item.key);
+      go();
+    };
+    ch.appendChild(document.createTextNode(item.l));
+    ch.appendChild(btn);
+    c.appendChild(ch);
+  });
+}
+
+function reset(){
+  g("q").value="";g("clr").style.display="none";
+  ["Org","Svc","Aud","Area"].forEach(function(k){
+    selected[k]=[];
+    updateBtnLabel(k);
+    var panel=g("f"+k+"-panel");
+    var cbs=panel.querySelectorAll("input");
+    for(var i=0;i<cbs.length;i++){cbs[i].checked=false}
+  });
+  g("rst").classList.remove("on");
+  g("chips").classList.remove("on");
+  render(DATA);
+  g("pill").textContent="37 ארגונים";
+  g("empty").style.display="none";
+}
+
+function firstArea(a){
+  var p=sp(a);
+  if(!p.length)return"";
+  for(var i=0;i<p.length;i++){if(p[i]==="ארצי")return"ארצי"}
+  return p[0];
+}
+
+function render(items){
+  var grid=g("grid");grid.innerHTML="";
+  items.forEach(function(d,i){
+    var svcs=sp(d.service).slice(0,3);
+    var auds=sp(d.audience);
+    var card=document.createElement("div");
+    card.className="card";card.tabIndex=0;
+    card.style.animationDelay=(i*20)+"ms";
+    (function(data){
+      card.onclick=function(){openM(data)};
+      card.onkeydown=function(e){if(e.key==="Enter"||e.key===" ")openM(data)};
+    })(d);
+    var allAreas=sp(d.area);
+    var moreSvc=sp(d.service).length>3?"<span class='stag'>+"+( sp(d.service).length-3)+"</span>":"";
+    var areaTags=allAreas.map(function(a){return"<span class='c-area-tag'>"+a+"</span>"}).join("");
+    var audTags=auds.map(function(a){return"<span class='c-aud-tag'>"+a+"</span>"}).join("");
+    card.innerHTML=
+      "<div class='c-top'><div class='c-org'>"+d.org+"</div></div>"+
+      (areaTags?"<div class='c-areas'>"+areaTags+"</div>":"")+
+      "<div class='c-rep'>"+d.rep+"</div>"+
+      
+      "<div class='c-sum'>"+d.details+"</div>"+
+      "<div class='c-foot'><svg class='c-aud-icon' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='#534AB7' stroke-width='2' stroke-linecap='round' style='flex-shrink:0;min-width:13px'><path d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/></svg>"+audTags+"<svg style='margin-right:auto;flex-shrink:0' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#AFA9EC' stroke-width='2' stroke-linecap='round'><line x1='19' y1='12' x2='5' y2='12'/><polyline points='12 5 5 12 12 19'/></svg></div>";
+    grid.appendChild(card);
+  });
+}
+
+function dc(v){return v==="כן"?"d-y":v==="לא"?"d-n":"d-p"}
+
+function openM(d){
+  var areas=sp(d.area),svcs=sp(d.service),auds=sp(d.audience);
+  var website=d.website?"<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><circle cx='12' cy='12' r='10'/><line x1='2' y1='12' x2='22' y2='12'/><path d='M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z'/></svg><a class='cl' href='"+d.website+"' target='_blank' rel='noopener'>"+d.website.replace("https://","").replace("www.","").replace(/\/$/,"")+"</a></div>":"";
+  var areaBlock="<div style='border-right:3px solid #0F6E56;padding-right:9px;margin-bottom:13px'>"+
+    "<div style='font-size:10px;font-weight:700;color:#0F6E56;letter-spacing:.07em;margin-bottom:5px'>אזור פעילות</div>"+
+    "<div style='display:flex;flex-wrap:wrap;gap:5px'>"+areas.map(function(a){return"<span style='font-size:11px;padding:3px 9px;border-radius:20px;background:#E1F5EE;color:#0F6E56;font-weight:500'>"+a+"</span>"}).join("")+"</div></div>";
+  var svcBlock="<div style='border-right:3px solid #888780;padding-right:9px;margin-bottom:13px'>"+
+    "<div style='font-size:10px;font-weight:700;color:#5F5E5A;letter-spacing:.07em;margin-bottom:5px'>מענה</div>"+
+    "<div style='display:flex;flex-wrap:wrap;gap:5px'>"+svcs.map(function(s){return"<span style='font-size:11px;padding:3px 9px;border-radius:20px;background:#F1EFE8;color:#5F5E5A;font-weight:500'>"+s+"</span>"}).join("")+"</div></div>";
+  var audBlock="<div style='border-right:3px solid #534AB7;padding-right:9px;margin-bottom:13px'>"+
+    "<div style='font-size:10px;font-weight:700;color:#534AB7;letter-spacing:.07em;margin-bottom:5px'>קהל יעד</div>"+
+    "<div style='display:flex;flex-wrap:wrap;gap:5px'>"+auds.map(function(a){return"<span style='font-size:11px;padding:3px 9px;border-radius:20px;background:#EEEDFE;color:#534AB7;font-weight:500'>"+a+"</span>"}).join("")+"</div></div>";
+  var offerBlock=d.offer?("<div class='divhr'></div><div class='msec'><div class='msec-l'>יש לנו מה להציע בחינם / בעלות סמלית לארגוני הפורום</div><div class='msec-v'>"+d.offer+"</div></div>"):"";
+  g("mc").innerHTML=
+    "<div class='m-org'>"+d.org+"</div>"+
+    "<div class='m-rep'>נציג.ה: "+d.rep+"</div>"+
+    (d.lastUpdated?"<div class='upd-badge'>🕓 עודכן לאחרונה: "+d.lastUpdated+"</div>":"")+
+    "<div class='divhr'></div>"+
+    areaBlock+
+    svcBlock+
+    "<div class='divhr'></div>"+
+    "<div class='msec'><div class='msec-l'>תיאור המענה</div><div class='msec-v'>"+d.details+"</div></div>"+
+    offerBlock+
+    "<div class='divhr'></div>"+
+    audBlock+
+    "<div class='inds'><div class='ind'><div class='dot "+dc(d.over26)+"'></div>מלווים מעל גיל 26: "+d.over26+"</div><div class='ind'><div class='dot "+dc(d.mothers)+"'></div>מלווים הורים/אמהות: "+d.mothers+"</div></div>"+
+    "<div class='divhr'></div>"+
+    "<div class='contacts'>"+
+    "<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><path d='M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z'/></svg><a class='cl' href='tel:"+d.phone+"'>"+d.phone+"</a></div>"+
+    "<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><path d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'/><polyline points='22,6 12,13 2,6'/></svg><a class='cl' href='mailto:"+d.email+"'>"+d.email+"</a></div>"+
+    website+
+    "<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><path d='M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7'/><path d='M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z'/></svg><a class='cl' href='https://docs.google.com/forms/d/e/1FAIpQLSezdDcSEU1ch6_IjbprdvqzR3b4vCfnMbUZRXc3dKGi9OoZCg/viewform?usp=dialog' target='_blank' rel='noopener'>עדכון פרטי הארגון</a></div>"+
+    "</div>";
+  g("ov").classList.add("on");
+  document.body.style.overflow="hidden";
+}
+
+function closeM(e){
+  if(e&&e.target!==g("ov"))return;
+  g("ov").classList.remove("on");
+  document.body.style.overflow="";
+}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeM(null);}});
+
+/* ===== שיתופי פעולה בין ארגונים (B2B) ===== */
+var COLLAB_TAGS=["הרצאות","הכשרות","ייעוץ מקצועי","שיתוף ידע","חומרי הדרכה","חלל לפעילות","חדר ישיבות","השאלת ציוד","שותפות לפרויקט","מחקר והערכה","גיוס משאבים","אחר"];
+var FORMAT_OPTS=["דיגיטלי","פרונטלי","היברידי"];
+var COST_OPTS=["ללא עלות","עלות סמלית","בתשלום"];
+var CFILTS={COffer:{all:"כל סוגי ההצעה"},CFormat:{all:"כל המתכונות"},CCost:{all:"כל רמות העלות"}};
+var selC={COffer:[],CFormat:[],CCost:[]};
+
+function switchView(v){
+  g("collab-btn").classList.toggle("on",v==="collab");
+  g("domain-btn").classList.toggle("on",v==="domain");
+  g("searchControls").style.display=v==="search"?"":"none";
+  g("collabControls").style.display=v==="collab"?"":"none";
+  g("domainControls").style.display=v==="domain"?"":"none";
+  g("searchMain").style.display=v==="search"?"":"none";
+  g("collabMain").style.display=v==="collab"?"":"none";
+  g("domainMain").style.display=v==="domain"?"":"none";
+  if(v==="domain")renderDomainMap();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function buildMselC(key,arr){
+  var panel=g("f"+key+"-panel");
+  panel.innerHTML="";
+  arr.forEach(function(v){
+    var lbl=document.createElement("label");
+    lbl.className="msel-opt";
+    var cb=document.createElement("input");
+    cb.type="checkbox";cb.value=v;
+    cb.addEventListener("change",function(){toggleValC(key,v,cb.checked)});
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(v));
+    panel.appendChild(lbl);
+  });
+}
+function toggleValC(key,v,checked){
+  var arr=selC[key];
+  var i=arr.indexOf(v);
+  if(checked&&i<0)arr.push(v);
+  if(!checked&&i>=0)arr.splice(i,1);
+  updateBtnLabelC(key);
+  goC();
+}
+function updateBtnLabelC(key){
+  var btn=g("f"+key+"-btn");
+  var arr=selC[key];
+  if(arr.length===0)btn.textContent=CFILTS[key].all;
+  else if(arr.length===1)btn.textContent=arr[0];
+  else btn.textContent=arr.length+" נבחרו";
+  btn.classList.toggle("on",arr.length>0);
+}
+function toggleMselC(key){
+  var panel=g("f"+key+"-panel");
+  var isOpen=panel.classList.contains("on");
+  closeAllMselC();
+  closeAllMsel();
+  if(!isOpen)panel.classList.add("on");
+}
+function closeAllMselC(){
+  ["COffer","CFormat","CCost"].forEach(function(k){g("f"+k+"-panel").classList.remove("on")});
+}
+document.addEventListener("click",function(e){
+  if(!e.target.closest(".msel"))closeAllMselC();
+});
+
+buildMselC("COffer",COLLAB_TAGS);
+buildMselC("CFormat",FORMAT_OPTS);
+buildMselC("CCost",COST_OPTS);
+
+g("cq").addEventListener("input",function(){
+  g("cclr").style.display=g("cq").value?"block":"none";
+  goC();
+});
+function clearCQ(){g("cq").value="";g("cclr").style.display="none";goC()}
+
+function uncheckOptC(key,val){
+  var panel=g("f"+key+"-panel");
+  var cbs=panel.querySelectorAll("input");
+  for(var i=0;i<cbs.length;i++){if(cbs[i].value===val){cbs[i].checked=false;break}}
+}
+
+function goC(){
+  var q=g("cq").value.trim().toLowerCase();
+  var offer=selC.COffer,fmt=selC.CFormat,cost=selC.CCost;
+  var hasF=!!(q||offer.length||fmt.length||cost.length);
+  g("crst").classList.toggle("on",hasF);
+  updateChipsC(q,offer,fmt,cost);
+  var res=DATA.filter(function(d){
+    var offs=d.collab||[];
+    if(offer.length&&!offs.some(function(o){return offer.some(function(v){return o.tags.indexOf(v)>=0})}))return false;
+    if(fmt.length&&!offs.some(function(o){return fmt.some(function(v){return sp(o.format).indexOf(v)>=0})}))return false;
+    if(cost.length&&!offs.some(function(o){return cost.some(function(v){return sp(o.cost).indexOf(v)>=0})}))return false;
+    if(q){
+      var b=[d.org,d.rep,offs.map(function(o){return o.tags.join(" ")+" "+o.note}).join(" ")].join(" ").toLowerCase();
+      if(b.indexOf(q)<0)return false;
+    }
+    return true;
+  });
+  renderC(res);
+  g("cempty").style.display=res.length===0?"block":"none";
+}
+
+function updateChipsC(q,offer,fmt,cost){
+  var c=g("cchips");
+  var items=[];
+  if(q)items.push({l:"חיפוש: "+q,key:"q",val:null});
+  offer.forEach(function(v){items.push({l:"הצעה: "+v,key:"COffer",val:v})});
+  fmt.forEach(function(v){items.push({l:"מתכונת: "+v,key:"CFormat",val:v})});
+  cost.forEach(function(v){items.push({l:"עלות: "+v,key:"CCost",val:v})});
+  if(!items.length){c.classList.remove("on");return}
+  c.classList.add("on");
+  c.innerHTML="<span class='chips-lbl'>מסננים פעילים:</span>";
+  items.forEach(function(item){
+    var ch=document.createElement("span");
+    ch.className="chip";
+    var btn=document.createElement("button");
+    btn.className="chip-x";
+    btn.textContent="×";
+    btn.onclick=function(){
+      if(item.key==="q"){clearCQ();return}
+      var arr=selC[item.key];
+      var i=arr.indexOf(item.val);
+      if(i>=0)arr.splice(i,1);
+      uncheckOptC(item.key,item.val);
+      updateBtnLabelC(item.key);
+      goC();
+    };
+    ch.appendChild(document.createTextNode(item.l));
+    ch.appendChild(btn);
+    c.appendChild(ch);
+  });
+}
+
+function resetC(){
+  g("cq").value="";g("cclr").style.display="none";
+  ["COffer","CFormat","CCost"].forEach(function(k){
+    selC[k]=[];
+    updateBtnLabelC(k);
+    var panel=g("f"+k+"-panel");
+    var cbs=panel.querySelectorAll("input");
+    for(var i=0;i<cbs.length;i++){cbs[i].checked=false}
+  });
+  g("crst").classList.remove("on");
+  g("cchips").classList.remove("on");
+  goC();
+}
+
+function renderC(items){
+  var grid=g("cgrid");grid.innerHTML="";
+  items.forEach(function(d,i){
+    var card=document.createElement("div");
+    card.className="card";card.tabIndex=0;
+    card.style.animationDelay=(i*20)+"ms";
+    (function(data){
+      card.onclick=function(){openCollabM(data)};
+      card.onkeydown=function(e){if(e.key==="Enter"||e.key===" ")openCollabM(data)};
+    })(d);
+    var offs=d.collab||[];
+    var allTags=uniq(offs.reduce(function(a,o){return a.concat(o.tags)},[]));
+    var offerTags=allTags.map(function(t){return"<span class='otag'>"+t+"</span>"}).join("");
+    var summary;
+    if(offs.length===0)summary="<span style='color:var(--muted)'>טרם עודכנו הצעות שיתוף פעולה</span>";
+    else if(offs.length===1)summary=offs[0].note;
+    else summary=offs.length+" הצעות לשיתוף פעולה";
+    card.innerHTML=
+      "<div class='c-top'><div class='c-org'>"+d.org+"</div></div>"+
+      "<div class='c-rep'>"+d.rep+"</div>"+
+      (offerTags?"<div class='c-tags'>"+offerTags+"</div>":"")+
+      "<div class='c-sum'>"+summary+"</div>";
+    grid.appendChild(card);
+  });
+}
+
+function openCollabM(d){
+  var offs=d.collab||[];
+  var offersHtml=offs.length?offs.map(function(c,idx){
+    var tagsHtml="<div style='display:flex;flex-wrap:wrap;gap:5px'>"+c.tags.map(function(t){return"<span class='otag' style='font-size:12px;padding:4px 12px'>"+t+"</span>"}).join("")+"</div>";
+    var meta=[];
+    if(c.format)meta.push("<span class='b-area'>"+c.format+"</span>");
+    if(c.cost)meta.push("<span class='b-svc'>"+c.cost+"</span>");
+    return "<div class='msec'"+(idx>0?" style='margin-top:18px;padding-top:16px;border-top:1px solid var(--border)'":"")+">"+
+      tagsHtml+
+      (meta.length?"<div class='m-badges' style='margin-top:8px'>"+meta.join("")+"</div>":"")+
+      (c.note?"<div class='msec-v' style='margin-top:8px'>"+c.note+"</div>":"")+
+      (c.contact?"<div style='margin-top:6px;font-size:12px;color:var(--muted)'>איש קשר להצעה: "+c.contact+"</div>":"")+
+      "</div>";
+  }).join("") : "<div class='msec-v' style='color:var(--muted)'>הארגון טרם עדכן הצעות לשיתוף פעולה. ניתן ליצור קשר ישירות עם הנציג.ה לבירור.</div>";
+  var website=d.website?"<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><circle cx='12' cy='12' r='10'/><line x1='2' y1='12' x2='22' y2='12'/><path d='M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z'/></svg><a class='cl' href='"+d.website+"' target='_blank' rel='noopener'>"+d.website.replace("https://","").replace("www.","").replace(/\/$/,"")+"</a></div>":"";
+  g("mc").innerHTML=
+    "<div class='m-org'>"+d.org+"</div>"+
+    "<div class='m-rep'>נציג.ה: "+d.rep+"</div>"+
+    (d.lastUpdated?"<div class='upd-badge'>🕓 עודכן לאחרונה: "+d.lastUpdated+"</div>":"")+
+    "<div class='divhr'></div>"+
+    "<div class='msec-l' style='margin-bottom:10px'>🤝 מה הארגון מציע לארגונים אחרים</div>"+
+    offersHtml+
+    "<div class='divhr'></div>"+
+    "<div class='contacts'>"+
+    "<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><path d='M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z'/></svg><a class='cl' href='tel:"+d.phone+"'>"+d.phone+"</a></div>"+
+    "<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><path d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'/><polyline points='22,6 12,13 2,6'/></svg><a class='cl' href='mailto:"+d.email+"'>"+d.email+"</a></div>"+
+    website+
+    "<div class='crow'><svg class='ci' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'><path d='M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7'/><path d='M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z'/></svg><a class='cl' href='https://docs.google.com/forms/d/e/1FAIpQLSezdDcSEU1ch6_IjbprdvqzR3b4vCfnMbUZRXc3dKGi9OoZCg/viewform?usp=dialog' target='_blank' rel='noopener'>עדכון פרטי הארגון</a></div>"+
+    "</div>";
+  g("ov").classList.add("on");
+  document.body.style.overflow="hidden";
+}
+
+render(DATA);
+goC();
+
+/* ===== מפת תחומים ===== */
+var AUD_SYNONYMS={
+  "חסרי/ות עורף משפחתי":"חסרי עורף משפחתי",
+  "מבקשי/ות מקלט":"מבקשי מקלט",
+  "נפגעי/ות טראומה":"נפגעי טראומה",
+  "להט\"בק":"להטב"
+};
+function normAud(v){return AUD_SYNONYMS[v]||v}
+
+function renderDomainMap(){
+  var grid=g("dgrid");
+  if(grid.dataset.built)return;
+  grid.dataset.built="1";
+  var groups={};
+  DATA.forEach(function(d){
+    var seen={};
+    sp(d.audience).forEach(function(raw){
+      var v=normAud(raw);
+      if(seen[v])return;
+      seen[v]=true;
+      if(!groups[v])groups[v]=[];
+      groups[v].push(d);
+    });
+  });
+  var keys=Object.keys(groups).sort(function(a,b){return groups[b].length-groups[a].length});
+  grid.innerHTML="";
+  keys.forEach(function(k){
+    var card=document.createElement("div");
+    card.className="dcard";
+    var orgsHtml=groups[k].map(function(d){
+      return "<span class='dorg' data-org=\""+d.org.replace(/"/g,"&quot;")+"\">"+d.org+"</span>";
+    }).join("");
+    card.innerHTML=
+      "<div class='dcard-h'><div class='dcard-t'>"+k+"</div><div class='dcard-n'>"+groups[k].length+"</div></div>"+
+      "<div>"+orgsHtml+"</div>";
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll(".dorg").forEach(function(el){
+    el.addEventListener("click",function(){
+      var name=el.getAttribute("data-org");
+      var d=DATA.find(function(x){return x.org===name});
+      if(d)openM(d);
+    });
+  });
+}
+</script>
+</body>
+</html>
